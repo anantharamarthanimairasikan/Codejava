@@ -11,12 +11,12 @@ public class FileSearchusingExtension {
 	String path = sc.nextLine();
 	
 	System.out.println("Enter the Extentsion");
-	String filename=sc.nextLine();
+	String ext=sc.nextLine();
 	File file = new File(path);
 	if(file.isDirectory()) {
 		File []files=file.listFiles();
 		for(File file1:files) {
-			if(file1.isFile()&& file1.getName().equals(filename))
+			if(file1.isFile()&& file1.getName().endsWith(ext))
 				System.out.println("File founded");
 				System.out.println(file1.getName());
 				break;
