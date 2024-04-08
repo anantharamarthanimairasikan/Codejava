@@ -19,11 +19,11 @@ public class Number {
 		}else {
 			System.out.println(n+"is Not a Amstrong Number");
 		}
-		boolean result2=checkPolindrome(n);
+		boolean result2=checkPalindrome(n);
 		if(result2) {
-			System.out.println(n+"is Polindrome Number");
+			System.out.println(n+"is Palindrome Number");
 		}else {
-			System.out.println(n+"is Not a Polindrome Number");
+			System.out.println(n+"is Not a Palindrome Number");
 		}
 		scan.close();
 	}
@@ -58,7 +58,7 @@ public class Number {
 		return status;
 		
 	}
-	public static boolean checkPolindrome(int N) {
+	public static boolean checkPalindrome(int N) {
 		boolean status= false;
 		int r, sum = 0, temp;
         temp = N;
