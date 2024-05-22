@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assignment</title>
+  <link rel="stylesheet" href="../Assignment/ass.css">
+  <script src="ass.js"></script>
+</head>
+<body>
+  <form id="use-case-form">
+    <label class="labels"for="name">Name:</label>
+    <input type="text" class="input1" id="name" name="name" required placeholder="Enter the name 'Joesph'">
+    <br>
+    <label class="labels" for="email">Email Id:</label>
+    <input class="input2" type="email" id="email" name="email" required placeholder="Enter the email id 'xyz@gmail.com'">
+    <br>
+    <label class="labels" for="contact">Contact No:</label>
+    <input type="tel" class="input3" id="contact" name="contact" inputmode="numeric" pattern="[0-9]*" placeholder="Enter the contact no '1234567890'" required>
+    <br>
+    <label class="labels" for="account-type">Account Type:</label>
+    <select id="account-type" name="account-type" required>
+      <option value="None">Select account type</option>
+      <option value="savings">Savings</option>
+      <option value="current">Current</option>
+    </select>
+    <br>
+    <button type="submit">Add Customer</button>
+  </form>
+  <table id="userdetails" class="tabledesign">
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Contact</th>
+      <th>Accout Type</th>
+    </tr>
+    <tbody></tbody>
+  </table>
+</body>
+</html>
