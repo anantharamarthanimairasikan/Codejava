@@ -1,0 +1,14 @@
+.row{
+  display: block;
+}
+.col-md-6{
+  float: left;
+  width: 45%;
+  margin-left: 10px;
+}
+.details{
+  margin-left: 60px;
+  margin-top: 40px;
+}
+
+
