@@ -2,6 +2,8 @@ package com.prodapt.capstoneproject.entities;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,6 +32,7 @@ public class Notification {
     private long notificationid;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "accountid", referencedColumnName = "accountid")
+    @JsonBackReference
     private Account account;
     @Column(nullable = false)
     private LocalDate sendDate;

@@ -95,7 +95,7 @@ public class AuthController {
 	
 	@PostMapping("/signup/customer")
 	public ResponseEntity<MessageResponse> registerCustomer(@RequestBody Customer customer) {
-		if (Boolean.TRUE.equals(userRepository.existsByUsername(customer.getUsername()))) {
+		if (userRepository.existsByUsername(customer.getUsername())) {
 			return ResponseEntity
 					.badRequest()
 					.body(new MessageResponse("Error: Username is already taken!"));
@@ -118,7 +118,7 @@ public class AuthController {
 		UserEntity user = new UserEntity();
 		user.setUsername(customer.getUsername());
 		user.setPassword(encoder.encode(customer.getPassword()));
-		user.setRole(ERole.Customer);
+		user.setRole(ERole.CUSTOMER);
 		userRepository.save(user);
 		
 		
@@ -129,22 +129,21 @@ public class AuthController {
 	
 	@PostMapping("/signup/admin")
 	public ResponseEntity<MessageResponse> registerAdmin(@RequestBody Admin admin) {
-		if (Boolean.TRUE.equals(userRepository.existsByUsername(admin.getUsername()))) {
+		if (userRepository.existsByUsername(admin.getUsername())) {
 			return ResponseEntity
 					.badRequest()
 					.body(new MessageResponse("Error: Username is already taken!"));
 		}
 		
-		// Create new user's account
 		UserEntity user = new UserEntity();
 		user.setUsername(admin.getUsername());
 		user.setPassword(encoder.encode(admin.getPassword()));
-		user.setRole(ERole.Support_Admin);
+		user.setRole(ERole.SUPPORT_ADMIN);
 		userRepository.save(user);
 		adminRepository.save(admin);
 		
 
-		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+		return ResponseEntity.ok(new MessageResponse("Admin Added successfully!"));
 	}
 
 }

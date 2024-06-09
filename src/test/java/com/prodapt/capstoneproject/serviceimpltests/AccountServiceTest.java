@@ -1,6 +1,7 @@
 package com.prodapt.capstoneproject.serviceimpltests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -162,6 +163,33 @@ public class AccountServiceTest {
         // Act and Assert
         NullPointerException exception = assertThrows(NullPointerException.class, () -> accountService.getAllAccounts());
         assertEquals("accountRepository.findAll() returned null", exception.getMessage());
+    }
+    }
+    
+    @Test
+    void testGetAccountusingCustomerId_Success() throws AccountNotFoundException {
+    	if(accountRepository!=null) {
+        Integer id = 1;
+        Account account = new Account();
+        when(accountRepository.findByCustomerId(id)).thenReturn(Optional.of(account));
+
+        // Act
+        Account result = accountService.getAccountusingCustomerId(id);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(account, result);
+    }
+    }
+
+    @Test
+    void testGetAccountusingCustomerId_Failure() {
+    	if(accountRepository!=null) {
+        Integer id = 1;
+        when(accountRepository.findByCustomerId(id)).thenReturn(Optional.empty());
+
+        // Act and Assert
+        assertThrows(AccountNotFoundException.class, () -> accountService.getAccountusingCustomerId(id));
     }
     }
 

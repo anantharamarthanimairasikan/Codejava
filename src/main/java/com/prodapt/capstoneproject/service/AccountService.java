@@ -16,4 +16,6 @@ public interface AccountService {
 	void deleteAccount(Long id) throws AccountNotFoundException;
 
 	List<Account> getAllAccounts();
+	
+	Account getAccountusingCustomerId(Integer id) throws AccountNotFoundException;
 }

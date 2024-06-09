@@ -2,6 +2,7 @@ package com.prodapt.capstoneproject.service;
 
 import com.prodapt.capstoneproject.entities.Payments;
 import com.prodapt.capstoneproject.exceptions.PaymentNotFoundException;
+import com.prodapt.capstoneproject.model.PaymentDetails;
 
 import java.util.List;
 
@@ -16,4 +17,6 @@ public interface PaymentService {
 	void deletePayment(Long id)throws PaymentNotFoundException;
 
 	List<Payments> getAllPayments();
+	
+	List<PaymentDetails> getPaymentDetailsReport();
 }

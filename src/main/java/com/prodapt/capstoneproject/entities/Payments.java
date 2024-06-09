@@ -2,6 +2,8 @@ package com.prodapt.capstoneproject.entities;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,9 +32,9 @@ public class Payments {
     private long paymentid;
  
     @ManyToOne(cascade = CascadeType.ALL)
+    @JsonBackReference
     @JoinColumn(name = "accountid", referencedColumnName = "accountid")
     private Account account;
- 
     @Column(nullable = false)
     private LocalDate paymentDate;
  
@@ -40,4 +42,6 @@ public class Payments {
  
     @Enumerated(EnumType.STRING)
     private Epaymethod method;
+    
+    
 }

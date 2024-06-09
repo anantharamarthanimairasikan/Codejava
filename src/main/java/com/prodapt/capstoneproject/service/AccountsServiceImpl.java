@@ -24,37 +24,49 @@ public class AccountsServiceImpl implements AccountService {
 	@Override
 	public Account updateAccount(Account account) throws AccountNotFoundException {
 		Optional<Account> existingAccount = accountrep.findById(account.getAccountid());
-		if (!existingAccount.isPresent()) {
+		if (existingAccount.isPresent()) {
+			return accountrep.save(account);
+		}else {
 			throw new AccountNotFoundException("Account was not found with ID: " + account.getAccountid());
 		}
-		Account updatedAccount = accountrep.save(account);
-		return updatedAccount;
+		
 	}
 
 	@Override
 	public Account getAccount(Long id) throws AccountNotFoundException  {
 		Optional<Account> account = accountrep.findById(id);
-		if (!account.isPresent()) {
+		if (account.isPresent()) {
+			return account.get();
+		}else {
 			throw new AccountNotFoundException("Account not found with ID: " + id);
 		}
-		return account.get();
+		
 	}
 
 	@Override
 	public void deleteAccount(Long id) throws AccountNotFoundException{
 		Optional<Account> account = accountrep.findById(id);
-		if (!account.isPresent()) {
+		if (account.isPresent()) {
+			accountrep.deleteById(id);
+		}else {
 			throw new AccountNotFoundException("Account not found with ID: " + id);
 		}
-		accountrep.deleteById(id);
+		
 	}
 
 	@Override
 	public List<Account> getAllAccounts() {
 		return (List<Account>) accountrep.findAll();
 	}
-	
-	
-	
+
+	@Override
+	public Account getAccountusingCustomerId(Integer id) throws AccountNotFoundException {
+		Optional<Account> existingaccount = accountrep.findByCustomerId(id);
+		if(existingaccount.isPresent()) {
+			return existingaccount.get();
+		}else {
+			throw new AccountNotFoundException("Account was not found with customer ID: " + id);
+		}
+	}
 	
 }

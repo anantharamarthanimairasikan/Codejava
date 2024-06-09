@@ -33,4 +33,6 @@ public class Customer {
     private Estatus status;
     private String username;
     private String password;
+    
+    
 }

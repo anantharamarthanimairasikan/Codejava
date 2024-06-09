@@ -23,27 +23,32 @@ public class ReportsServiceImpl implements ReportService {
 
 	@Override
 	public Reports updateReport(Reports report) throws ReportNotFoundException {
-		if (getReport(report.getReportid()) == null) {
-			throw new ReportNotFoundException("Report not found with id: " + report.getReportid());
+		if (getReport(report.getReportid()) != null) {
+			return reportRepo.save(report);
+		}else {
+			throw new ReportNotFoundException("Report was not found with id: " + report.getReportid());
 		}
-		return reportRepo.save(report);
+		
 	}
 
 	@Override
 	public Reports getReport(Long id) throws ReportNotFoundException {
 		Optional<Reports> report = reportRepo.findById(id);
-		if (!report.isPresent()) {
+		if (report.isPresent()) {
+			return report.get();
+		}else {
 			throw new ReportNotFoundException("Report not found with id: " + id);
 		}
-		return report.get();
 	}
 
 	@Override
 	public void deleteReport(Long id) throws ReportNotFoundException {
-		if (getReport(id) == null) {
+		if (getReport(id) != null) {
+			reportRepo.deleteById(id);
+		}else {
 			throw new ReportNotFoundException("Report not found with id: " + id);
 		}
-		reportRepo.deleteById(id);
+		
 	}
 
 	@Override

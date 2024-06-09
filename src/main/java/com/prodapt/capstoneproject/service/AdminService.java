@@ -2,6 +2,7 @@ package com.prodapt.capstoneproject.service;
 
 import com.prodapt.capstoneproject.entities.Admin;
 import com.prodapt.capstoneproject.exceptions.AdminNotFoundException;
+import com.prodapt.capstoneproject.model.AdminActionsReport;
 
 import java.util.List;
 
@@ -16,4 +17,6 @@ public interface AdminService{
     void delete(Long id)throws AdminNotFoundException;
 
     void deleteAll();
+    
+    List<AdminActionsReport> getAdminActionReport();
 }

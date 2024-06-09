@@ -33,7 +33,7 @@ public class Reports {
 	@Enumerated(EnumType.STRING)
 	private EReport type;
 	@ManyToOne(cascade =CascadeType.ALL)
-	@JoinColumn(name="adminid")
+	@JoinColumn(name="adminid", referencedColumnName = "adminid")
 	private Admin admin;
  
  

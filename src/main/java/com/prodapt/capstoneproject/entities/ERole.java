@@ -1,6 +1,6 @@
 package com.prodapt.capstoneproject.entities;
 
 public enum ERole {
-	Super_User_Admin,Support_Admin ,Customer
+	SUPER_USER_ADMIN,SUPPORT_ADMIN ,CUSTOMER
 
 }
