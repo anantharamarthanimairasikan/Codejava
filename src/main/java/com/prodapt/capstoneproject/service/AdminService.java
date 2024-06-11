@@ -19,4 +19,6 @@ public interface AdminService{
     void deleteAll();
     
     List<AdminActionsReport> getAdminActionReport();
+
+	Admin findByUsername(String username) throws AdminNotFoundException;
 }

@@ -155,4 +155,33 @@ public class AdminServiceTest {
         assertNotNull(reports);
         assertTrue(reports.isEmpty());
     }
+    
+    @Test
+    void testFindByUsername_Success() throws AdminNotFoundException {
+        // Mock data
+        String username = "testadmin";
+        Admin admin = new Admin();
+        admin.setUsername(username);
+
+        // Mock AdminRepository
+        when(adminRepository.findByUsername(username)).thenReturn(Optional.of(admin));
+
+        // Perform the method call
+        Admin result = adminService.findByUsername(username);
+
+        // Verify the result
+        assertEquals(admin, result);
+    }
+
+    @Test
+    void testFindByUsername_AdminNotFoundException() {
+        // Mock data
+        String username = "nonexistentadmin";
+
+        // Mock AdminRepository to return empty optional
+        when(adminRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+
+        assertThrows(AdminNotFoundException.class, () -> adminService.findByUsername(username));
+    }
 }

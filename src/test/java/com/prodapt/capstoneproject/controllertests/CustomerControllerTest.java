@@ -3,6 +3,7 @@ package com.prodapt.capstoneproject.controllertests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -174,4 +175,40 @@ public class CustomerControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals("Customer not found", response.getBody());
     }
+    
+    @Test
+    void testGetCustomerbyusername_Success() throws CustomerNotFoundException {
+        // Mock data
+        String username = "testuser";
+        Customer expectedCustomer = new Customer();
+        expectedCustomer.setId(1);
+        expectedCustomer.setUsername(username);
+
+        // Mock CustomerServic
+        when(customerService.findCustomerbyUsername(username)).thenReturn(expectedCustomer);
+
+     
+        ResponseEntity<Customer> response = customerController.getCustomerByUsername(username);
+
+        // Verify the response
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedCustomer, response.getBody());
+    }
+    
+    @Test
+    void testGetCustomerbyusername_CustomerNotFoundException() throws CustomerNotFoundException {
+        // Mock data
+        String username = "nonexistentuser";
+
+        // Mock CustomerService to throw CustomerNotFoundException
+        when(customerService.findCustomerbyUsername(username)).thenThrow(new CustomerNotFoundException("Customer not found"));
+
+        ResponseEntity<Customer> response = customerController.getCustomerByUsername(username);
+
+        // Verify the response
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+
+
 }

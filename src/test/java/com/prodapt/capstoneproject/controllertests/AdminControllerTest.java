@@ -4,49 +4,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 import com.prodapt.capstoneproject.controller.AdminController;
-import com.prodapt.capstoneproject.entities.Account;
 import com.prodapt.capstoneproject.entities.Admin;
-import com.prodapt.capstoneproject.entities.Customer;
-import com.prodapt.capstoneproject.entities.EMessage;
-import com.prodapt.capstoneproject.entities.EReport;
-import com.prodapt.capstoneproject.entities.EResponse;
-import com.prodapt.capstoneproject.entities.Notification;
-import com.prodapt.capstoneproject.entities.Reports;
-import com.prodapt.capstoneproject.exceptions.AccountNotFoundException;
 import com.prodapt.capstoneproject.exceptions.AdminNotFoundException;
 import com.prodapt.capstoneproject.model.AdminActionsReport;
 import com.prodapt.capstoneproject.model.CustomerStatusReport;
@@ -54,7 +27,6 @@ import com.prodapt.capstoneproject.model.DunningReport;
 import com.prodapt.capstoneproject.model.ExceptionReport;
 import com.prodapt.capstoneproject.model.PaymentDetails;
 import com.prodapt.capstoneproject.model.PerformanceDashboardReport;
-import com.prodapt.capstoneproject.model.UsersList;
 import com.prodapt.capstoneproject.service.AccountService;
 import com.prodapt.capstoneproject.service.AdminService;
 import com.prodapt.capstoneproject.service.CustomerService;
@@ -64,9 +36,6 @@ import com.prodapt.capstoneproject.service.ReportService;
 
 @WebMvcTest(AdminController.class)
 public class AdminControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @MockBean
     private AdminService adminService;
@@ -222,6 +191,39 @@ public class AdminControllerTest {
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(report, response.getBody());
+    }
+    
+    @Test
+    void testGetAdminByUsername_Success() throws AdminNotFoundException {
+        // Mock data
+        String username = "testadmin";
+        Admin expectedAdmin = new Admin();
+        expectedAdmin.setUsername(username);
+
+        // Mock AdminService
+        when(adminService.findByUsername(username)).thenReturn(expectedAdmin);
+
+        // Perform the method call
+        ResponseEntity<Admin> response = adminController.getAdminByUsername(username);
+
+        // Verify the response
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedAdmin, response.getBody());
+    }
+
+    @Test
+    void testGetAdminByUsername_AdminNotFoundException() throws AdminNotFoundException {
+        // Mock data
+        String username = "nonexistentadmin";
+
+        // Mock AdminService to throw AdminNotFoundException
+        when(adminService.findByUsername(anyString())).thenThrow(new AdminNotFoundException("Admin not found"));
+
+        // Perform the method call
+        ResponseEntity<Admin> response = adminController.getAdminByUsername(username);
+
+        // Verify the response
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
 

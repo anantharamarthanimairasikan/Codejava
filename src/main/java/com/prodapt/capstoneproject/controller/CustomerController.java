@@ -64,4 +64,15 @@ public class CustomerController {
     public ResponseEntity<String> handleCustomerNotFoundException(CustomerNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+    
+    @GetMapping("/getcustomer/{username}")
+    public ResponseEntity<Customer> getCustomerByUsername(@PathVariable String username) {
+        try {
+            Customer customer = cservice.findCustomerbyUsername(username);
+            return ResponseEntity.ok(customer);
+        } catch (CustomerNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

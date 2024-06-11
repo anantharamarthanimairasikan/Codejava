@@ -161,4 +161,42 @@ public class CustomerServiceTest {
         assertNotNull(reports);
         assertTrue(reports.isEmpty());
     }
+    
+    @Test
+    void testFindCustomerbyUsername_Success() {
+        // Mock data
+        String username = "existinguser";
+        Customer customer = new Customer();
+        customer.setUsername(username);
+
+        // Mock the customer repository to return the customer when findByUsername is called
+        when(customerRepository.findByUsername(username)).thenReturn(Optional.of(customer));
+
+        // Call the method
+        try {
+            Customer result = customerService.findCustomerbyUsername(username);
+
+            // Verify the result
+            assertNotNull(result);
+            assertEquals(username, result.getUsername());
+        } catch (CustomerNotFoundException e) {
+            fail("Unexpected CustomerNotFoundException");
+        }
+    }
+
+    @Test
+    void testFindCustomerbyUsername_CustomerNotFoundException() {
+        // Mock data
+        String username = "nonexistentuser";
+
+        // Mock the customer repository to return an empty optional when findByUsername is called
+        when(customerRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+        // Call the method and expect CustomerNotFoundException
+        assertThrows(CustomerNotFoundException.class, () -> {
+            customerService.findCustomerbyUsername(username);
+        });
+    }
+    
+    
 }

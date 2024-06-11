@@ -135,5 +135,15 @@ public class AdminController {
         }
         return ResponseEntity.ok("Notification send to the all customers");
     }
+    
+    @GetMapping("/getadmin/{username}")
+    public ResponseEntity<Admin> getAdminByUsername(@PathVariable String username) {
+        try {
+        	Admin admin = aservice.findByUsername(username);
+            return ResponseEntity.ok(admin);
+        } catch (AdminNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
      
 }

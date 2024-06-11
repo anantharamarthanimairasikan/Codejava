@@ -7,12 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.prodapt.capstoneproject.entities.Customer;
-import com.prodapt.capstoneproject.entities.UserEntity;
 import jakarta.transaction.Transactional;
 
 public interface CustomerRepository extends CrudRepository<Customer, Integer> {
 
-	public Optional<UserEntity> findByUsername(String username);
+	public Optional<Customer> findByUsername(String username);
 
 	public Boolean existsByUsername(String username);
 

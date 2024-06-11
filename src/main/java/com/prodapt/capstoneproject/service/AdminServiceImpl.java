@@ -76,4 +76,15 @@ public class AdminServiceImpl implements AdminService {
     private static final int ADMIN_ID_INDEX = 0;
     private static final int ACTIONS_INDEX = 1;
     private static final int REACTIVATIONS_INDEX = 2;
+    
+    @Override
+    public Admin findByUsername(String username) throws AdminNotFoundException {
+    	Optional<Admin> admin = adminRepository.findByUsername(username);
+    	if(admin.isPresent()) {
+    		return admin.get();
+    	}else {
+    		throw new AdminNotFoundException("No admins was found by username:"+username);
+    	}
+       
+    }
 }

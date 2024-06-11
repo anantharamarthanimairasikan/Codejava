@@ -13,6 +13,8 @@ public interface CustomerService {
 	Customer updateCustomer(Customer customer)throws CustomerNotFoundException;
 
 	Customer findCustomer(Integer id) throws CustomerNotFoundException;
+	
+	Customer findCustomerbyUsername(String username) throws CustomerNotFoundException;
 
 	void deleteCustomer(Integer id) throws CustomerNotFoundException;
 

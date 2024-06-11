@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.prodapt.capstoneproject.entities.Customer;
 import com.prodapt.capstoneproject.entities.Estatus;
+import com.prodapt.capstoneproject.entities.UserEntity;
 import com.prodapt.capstoneproject.exceptions.CustomerNotFoundException;
 import com.prodapt.capstoneproject.model.CustomerStatusReport;
 import com.prodapt.capstoneproject.repositories.CustomerRepository;
@@ -79,4 +80,14 @@ public class CustomerServiceImpl implements CustomerService {
     private static final int OVERDUE_AMOUNT_INDEX = 4;
     private static final int COMMUNICATION_COUNT_INDEX = 5;
     private static final int COMMUNICATION_HISTORY_INDEX = 6;
+
+	@Override
+	public Customer findCustomerbyUsername(String username) throws CustomerNotFoundException {
+		Optional<Customer> customer = customerRepository.findByUsername(username);
+		if (customer.isPresent()) {
+            return customer.get();
+        } else {
+            throw new CustomerNotFoundException("Customer not found with username: " + username);
+        }
+	}
 }
