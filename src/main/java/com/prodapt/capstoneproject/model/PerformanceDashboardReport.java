@@ -1,5 +1,7 @@
 package com.prodapt.capstoneproject.model;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,13 +14,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PerformanceDashboardReport {
-	private Integer recoveryRate;
-	private Integer effectiveness;
-	private Double avgResponseTime;
-	private Integer total_notifications;
-	private Integer total_accounts;
-	private Integer ignored_responses;
-	private Integer undeliverable_responses;
+	private BigDecimal recoveryRate;
+	private BigDecimal effectiveness;
+	private BigDecimal avgResponseTime;
+	private Long total_notifications;
+	private Long total_accounts;
+	private Long ignored_responses;
+	private Long undeliverable_responses;
 	
 	
 

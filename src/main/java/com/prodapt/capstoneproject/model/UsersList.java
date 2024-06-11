@@ -1,5 +1,6 @@
 package com.prodapt.capstoneproject.model;
 
+import java.util.List;
 import java.util.Set;
 
 import com.prodapt.capstoneproject.entities.Customer;
@@ -16,6 +17,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class UsersList {
-	private Set<Customer> customers;
+	private List<Customer> customers;
 
 }

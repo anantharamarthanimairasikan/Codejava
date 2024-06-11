@@ -54,7 +54,7 @@ public class AdminController {
 
     @PostMapping("/updateadmin")
     public ResponseEntity<Admin> updateCustomer(@RequestBody Admin admin) throws AdminNotFoundException {
-        Admin updatedAdmin = aservice.Updateadmin(admin);
+        Admin updatedAdmin = aservice.updateAdmin(admin);
         return ResponseEntity.ok(updatedAdmin);
     }
 
@@ -127,7 +127,7 @@ public class AdminController {
     public ResponseEntity<String> sendCustomernotification(@RequestBody UsersList users) throws AccountNotFoundException{
         for(Customer user: users.getCustomers()) {
         	Notification notification = new Notification();
-        	notification.setAccount(accservice.getAccountusingCustomerId(user.getId()));
+        	notification.setAccount(accservice.findAccountByCustomerId(user.getId()));
         	notification.setMethod(EMessage.EMAIL);
         	notification.setResponse(EResponse.valueOf(new Random().nextInt(EResponse.values().length)));
         	notification.setSendDate(LocalDate.now());

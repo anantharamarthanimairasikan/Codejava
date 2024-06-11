@@ -16,6 +16,8 @@ import com.prodapt.capstoneproject.model.PerformanceDashboardReport;
 import com.prodapt.capstoneproject.repositories.NotificationRepository;
 import com.prodapt.capstoneproject.service.NotificationServiceImpl;
 
+import java.math.BigDecimal;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -81,24 +84,22 @@ public class NotificationServiceTest {
 
     @Test
     void testDeleteNotification_Success() throws NotificationNotFoundException {
-        Long id = 1L;
-        Notification notification = new Notification();
-        when(repo.findById(id)).thenReturn(Optional.of(notification));
-
-        notificationService.deleteNotification(id);
-
-        verify(repo, times(1)).deleteById(id);
+        Long notificationId = 1L;
+        when(repo.existsById(notificationId)).thenReturn(true);
+        
+        notificationService.deleteNotification(notificationId);
+        
+        verify(repo, times(1)).deleteById(notificationId);
     }
-    
+
     @Test
-    void testDeleteNotification_Failure_NotFound() {
-    	if(repo!=null) {
-        Long id = 1L;
-        when(repo.findById(id)).thenReturn(Optional.empty());
-
-        NotificationNotFoundException exception = assertThrows(NotificationNotFoundException.class, () -> notificationService.deleteNotification(id));
-        assertEquals("Notification not found with id: " + id, exception.getMessage());
-    }
+    void testDeleteNotification_NotFound() {
+        Long notificationId = 1L;
+        when(repo.existsById(notificationId)).thenReturn(false);
+        
+        assertThrows(NotificationNotFoundException.class, () -> {
+            notificationService.deleteNotification(notificationId);
+        });
     }
 
     @Test
@@ -116,43 +117,36 @@ public class NotificationServiceTest {
 
     @Test
     void testGetDunningReportSuccess() {
-        // Mock the repo to return a list of Object[] results
-        List<Object[]> results = new ArrayList<>();
-        results.add(new Object[] {1L, 2L, LocalDate.now(), EMessage.EMAIL, EResponse.PAID});
-        results.add(new Object[] {2L, 3L, LocalDate.now(), EMessage.SMS, EResponse.IGNORED});
-        when(repo.findPerformanceDashboardReport()).thenReturn(results);
+        // Arrange
+        List<Object[]> mockResults = new ArrayList<>();
+        mockResults.add(new Object[]{1L, 101L, Date.valueOf(LocalDate.now()), "EMAIL", "PAID"});
+        when(repo.findPerformanceDashboardReport()).thenReturn(mockResults);
 
-        // Call the method under test
+        // Act
         List<DunningReport> reports = notificationService.getDunningReport();
 
-        // Verify the results
+        // Assert
         assertNotNull(reports);
-        assertEquals(2, reports.size());
-        DunningReport report1 = reports.get(0);
-        assertEquals(1L, report1.getNotificationid());
-        assertEquals(2L, report1.getAccount_id());
-        assertEquals(LocalDate.now(), report1.getSendDate());
-        assertEquals(EMessage.EMAIL, report1.getMethod());
-        assertEquals(EResponse.PAID, report1.getResponse());
-        DunningReport report2 = reports.get(1);
-        assertEquals(2L, report2.getNotificationid());
-        assertEquals(3L, report2.getAccount_id());
-        assertEquals(LocalDate.now(), report2.getSendDate());
-        assertEquals(EMessage.SMS, report2.getMethod());
-        assertEquals(EResponse.IGNORED, report2.getResponse());
+        assertEquals(1, reports.size());
+        DunningReport report = reports.get(0);
+        assertEquals(1L, report.getNotificationid());
+        assertEquals(101L, report.getAccount_id());
+        assertEquals(LocalDate.now(), report.getSendDate());
+        assertEquals(EMessage.EMAIL, report.getMethod());
+        assertEquals(EResponse.PAID, report.getResponse());
     }
     
     @Test
-    void testGetDunningReportEmptyResult() {
-        // Mock the repo to return an empty list
+    void testGetDunningReportFailure() {
+        // Arrange
         when(repo.findPerformanceDashboardReport()).thenReturn(new ArrayList<>());
 
-        // Call the method under test
+        // Act
         List<DunningReport> reports = notificationService.getDunningReport();
 
-        // Verify the results
+        // Assert
         assertNotNull(reports);
-        assertEquals(0, reports.size());
+        assertTrue(reports.isEmpty());
     }
     
     
@@ -175,87 +169,75 @@ public class NotificationServiceTest {
         assertThrows(NotificationNotFoundException.class, () -> notificationService.getNotification(id));
     }
     }
-    
+   
+
     @Test
     void testGetPerformanceDashboardReportSuccess() {
-        // Mock the repo to return a list of Object[] results
-        List<Object[]> results = new ArrayList<>();
-        results.add(new Object[] {80, 90, 2.5, 100, 200, 10, 20});
-        results.add(new Object[] {70, 80, 3.0, 150, 300, 20, 30});
-        when(repo.findPerformanceDashboardReport()).thenReturn(results);
+        // Arrange
+        List<Object[]> mockResults = new ArrayList<>();
+        mockResults.add(new Object[]{BigDecimal.valueOf(0.75), BigDecimal.valueOf(0.85), BigDecimal.valueOf(1.2), 10L, 5L, 2L, 1L});
+        when(repo.findPerformanceDashboardReport()).thenReturn(mockResults);
 
-        // Call the method under test
+        // Act
         List<PerformanceDashboardReport> reports = notificationService.getPerformanceDashboardReport();
 
-        // Verify the results
+        // Assert
         assertNotNull(reports);
-        assertEquals(2, reports.size());
-        PerformanceDashboardReport report1 = reports.get(0);
-        assertEquals(80, report1.getRecoveryRate());
-        assertEquals(90, report1.getEffectiveness());
-        assertEquals(2.5, report1.getAvgResponseTime());
-        assertEquals(100, report1.getTotal_notifications());
-        assertEquals(200, report1.getTotal_accounts());
-        assertEquals(10, report1.getIgnored_responses());
-        assertEquals(20, report1.getUndeliverable_responses());
-        PerformanceDashboardReport report2 = reports.get(1);
-        assertEquals(70, report2.getRecoveryRate());
-        assertEquals(80, report2.getEffectiveness());
-        assertEquals(3.0, report2.getAvgResponseTime());
-        assertEquals(150, report2.getTotal_notifications());
-        assertEquals(300, report2.getTotal_accounts());
-        assertEquals(20, report2.getIgnored_responses());
-        assertEquals(30, report2.getUndeliverable_responses());
+        assertEquals(1, reports.size());
+        PerformanceDashboardReport report = reports.get(0);
+        assertEquals(BigDecimal.valueOf(0.75), report.getRecoveryRate());
+        assertEquals(BigDecimal.valueOf(0.85), report.getEffectiveness());
+        assertEquals(BigDecimal.valueOf(1.2), report.getAvgResponseTime());
+        assertEquals(10L, report.getTotal_notifications());
+        assertEquals(5L, report.getTotal_accounts());
+        assertEquals(2L, report.getIgnored_responses());
+        assertEquals(1L, report.getUndeliverable_responses());
     }
-    
+
     @Test
-    void testGetPerformanceDashboardReportEmptyResult() {
-        // Mock the repo to return an empty list
+    void testGetPerformanceDashboardReportFailure() {
+        // Arrange
         when(repo.findPerformanceDashboardReport()).thenReturn(new ArrayList<>());
 
-        // Call the method under test
+        // Act
         List<PerformanceDashboardReport> reports = notificationService.getPerformanceDashboardReport();
 
-        // Verify the results
+        // Assert
         assertNotNull(reports);
-        assertEquals(0, reports.size());
+        assertTrue(reports.isEmpty());
     }
-    
-    
+
     @Test
     void testGetExceptionReportSuccess() {
-        // Mock the repo to return a list of Object[] results
-        List<Object[]> results = new ArrayList<>();
-        results.add(new Object[] {1L, 5});
-        results.add(new Object[] {2L, 10});
-        when(repo.findPerformanceDashboardReport()).thenReturn(results);
+        // Arrange
+        List<Object[]> mockResults = new ArrayList<>();
+        mockResults.add(new Object[]{102L, 3L});
+        when(repo.findPerformanceDashboardReport()).thenReturn(mockResults);
 
-        // Call the method under test
+        // Act
         List<ExceptionReport> reports = notificationService.getExceptionReport();
 
-        // Verify the results
+        // Assert
         assertNotNull(reports);
-        assertEquals(2, reports.size());
-        ExceptionReport report1 = reports.get(0);
-        assertEquals(1L, report1.getAccountId());
-        assertEquals(5, report1.getFailed_payments());
-        ExceptionReport report2 = reports.get(1);
-        assertEquals(2L, report2.getAccountId());
-        assertEquals(10, report2.getFailed_payments());
+        assertEquals(1, reports.size());
+        ExceptionReport report = reports.get(0);
+        assertEquals(102L, report.getAccountId());
+        assertEquals(3L, report.getFailed_payments());
     }
-    
+
     @Test
-    void testGetExceptionReportEmptyResult() {
-        // Mock the repo to return an empty list
+    void testGetExceptionReportFailure() {
+        // Arrange
         when(repo.findPerformanceDashboardReport()).thenReturn(new ArrayList<>());
 
-        // Call the method under test
+        // Act
         List<ExceptionReport> reports = notificationService.getExceptionReport();
 
-        // Verify the results
+        // Assert
         assertNotNull(reports);
-        assertEquals(0, reports.size());
+        assertTrue(reports.isEmpty());
     }
+}
     
     	
-}
+

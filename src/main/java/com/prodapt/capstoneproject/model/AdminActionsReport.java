@@ -13,7 +13,7 @@ import lombok.ToString;
 @ToString
 public class AdminActionsReport {
 	private Long adminid;
-	private Integer adminactions;
-	private Integer reactivations;
+	private Long adminactions;
+	private Long reactivations;
 
 }

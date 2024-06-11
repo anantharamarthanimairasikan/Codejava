@@ -99,13 +99,15 @@ public class ReportsServiceTest {
     
     @Test
     void testUpdateReport_Failure_NotFound() {
-    	if(reportRepo!=null) {   
+    	Long reportId = 0L;
         Reports report = new Reports();
-        when(reportRepo.findById(report.getReportid())).thenReturn(Optional.empty());
+        report.setReportid(reportId);
+        when(reportRepo.findById(reportId)).thenReturn(Optional.empty());
 
-        ReportNotFoundException exception = assertThrows(ReportNotFoundException.class, () -> reportService.updateReport(report));
-        assertEquals("Report not found with id: " + report.getReportid(), exception.getMessage());
-    }
+        // When and Then
+        ReportNotFoundException exception = assertThrows(ReportNotFoundException.class,
+                () -> reportService.updateReport(report));
+        assertEquals("Report was not found with id: " + reportId, exception.getMessage());
     }
 
     @Test

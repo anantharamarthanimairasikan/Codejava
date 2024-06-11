@@ -12,7 +12,7 @@ public interface CustomerService {
 
 	Customer updateCustomer(Customer customer)throws CustomerNotFoundException;
 
-	Customer getCustomer(Integer id) throws CustomerNotFoundException;
+	Customer findCustomer(Integer id) throws CustomerNotFoundException;
 
 	void deleteCustomer(Integer id) throws CustomerNotFoundException;
 

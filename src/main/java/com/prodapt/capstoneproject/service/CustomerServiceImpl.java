@@ -16,60 +16,67 @@ import com.prodapt.capstoneproject.repositories.CustomerRepository;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
-	
-	@Autowired
-	CustomerRepository custrep;
 
-	@Override
-	public Customer addCustomer(Customer customer) {
-		return custrep.save(customer);
-	}
-	
-	@Override
-	public Customer updateCustomer(Customer customer)throws CustomerNotFoundException {
-		if (getCustomer(customer.getId()) == null) {
-			throw new CustomerNotFoundException("Customer was not found with id: " + customer.getId());
-		}
-		return custrep.save(customer);
-	}
+    @Autowired
+    private CustomerRepository customerRepository;
 
-	@Override
-	public Customer getCustomer(Integer id) throws CustomerNotFoundException{
-		Optional<Customer> customer = custrep.findById(id);
-		if (!customer.isPresent()) {
-			throw new CustomerNotFoundException("Customer not found with id: " + id);
-		}
-		return customer.get();
-	}
+    @Override
+    public Customer addCustomer(Customer customer) {
+        return customerRepository.save(customer);
+    }
 
-	@Override
-	public void deleteCustomer(Integer id)throws CustomerNotFoundException {
-		if (getCustomer(id) == null) {
-			throw new CustomerNotFoundException("Customer not found with id: " + id);
-		}
-		custrep.deleteById(id);
-	}
+    @Override
+    public Customer updateCustomer(Customer customer) throws CustomerNotFoundException {
+    	findCustomer(customer.getId());
+        Customer updatedCustomer = customerRepository.save(customer);
+        return updatedCustomer;
+    }
 
-	@Override
-	public List<Customer> getAllCustomers() {
-		return (List<Customer>) custrep.findAll();
-	}
+    @Override
+    public Customer findCustomer(Integer id) throws CustomerNotFoundException {
+        Optional<Customer> customer = customerRepository.findById(id);
+        if (customer.isPresent()) {
+            return customer.get();
+        } else {
+            throw new CustomerNotFoundException("Customer not found with id: " + id);
+        }
+    }
 
-	@Override
-	public List<CustomerStatusReport> getCustomerStatusReport() {
-			 List<Object[]> results = custrep.getCustomerStatusReport();
-		        List<CustomerStatusReport> reports = new ArrayList<>();
-		        for (Object[] result : results) {
-		            CustomerStatusReport report = new CustomerStatusReport();
-		            report.setName((String) result[0]);
-		            report.setEmail((String) result[1]);
-		            report.setPhone((Long) result[2]);
-		            report.setStatus(Estatus.valueOf((String) result[3]));
-		            report.setOverdueAmount(((BigDecimal) result[4]).intValue());
-		            report.setCommunicationCount(((Integer) result[5]));
-		            report.setCommunicationHistory((String) result[6]);
-		            reports.add(report);
-		        }
-		        return reports;
-		    }
-	}
+    @Override
+    public void deleteCustomer(Integer id) throws CustomerNotFoundException {
+    	 Customer customer = findCustomer(id);
+    	 customerRepository.deleteById(id);
+        
+    }
+
+    @Override
+    public List<Customer> getAllCustomers() {
+        return (List<Customer>) customerRepository.findAll();
+    }
+
+    @Override
+    public List<CustomerStatusReport> getCustomerStatusReport() {
+        List<Object[]> results = customerRepository.getCustomerStatusReport();
+        List<CustomerStatusReport> reports = new ArrayList<>();
+        for (Object[] result : results) {
+            CustomerStatusReport report = new CustomerStatusReport();
+            report.setName((String) result[NAME_INDEX]);
+            report.setEmail((String) result[EMAIL_INDEX]);
+            report.setPhone((Long) result[PHONE_INDEX]);
+            report.setStatus(Estatus.valueOf((String) result[STATUS_INDEX]));
+            report.setOverdueAmount(((BigDecimal) result[OVERDUE_AMOUNT_INDEX]).intValue());
+            report.setCommunicationCount(((Integer) result[COMMUNICATION_COUNT_INDEX]));
+            report.setCommunicationHistory((String) result[COMMUNICATION_HISTORY_INDEX]);
+            reports.add(report);
+        }
+        return reports;
+    }
+
+    private static final int NAME_INDEX = 0;
+    private static final int EMAIL_INDEX = 1;
+    private static final int PHONE_INDEX = 2;
+    private static final int STATUS_INDEX = 3;
+    private static final int OVERDUE_AMOUNT_INDEX = 4;
+    private static final int COMMUNICATION_COUNT_INDEX = 5;
+    private static final int COMMUNICATION_HISTORY_INDEX = 6;
+}

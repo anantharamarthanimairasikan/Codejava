@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface AdminService{
 
-    Admin Updateadmin(Admin admin) throws AdminNotFoundException;
+    Admin updateAdmin(Admin admin) throws AdminNotFoundException;
 
     List<Admin> findAll();
 

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prodapt.capstoneproject.entities.Account;
-import com.prodapt.capstoneproject.entities.EResponse;
 import com.prodapt.capstoneproject.entities.Epaymethod;
 import com.prodapt.capstoneproject.entities.Payments;
 import com.prodapt.capstoneproject.exceptions.AccountNotFoundException;
@@ -31,52 +30,56 @@ import jakarta.transaction.Transactional;
 @RestController
 @Transactional
 @RequestMapping("/account")
-@PreAuthorize("hasERole('CUSTOMER')")
+@PreAuthorize("hasRole('CUSTOMER')")
 public class AccountController {
 
 	@Autowired
-	AccountService aservice;
-	
-	@Autowired
-	PaymentService pservice;
-
-	@GetMapping("/getallaccounts")
-	public ResponseEntity<List<Account>> getAllAccounts() {
-		List<Account> accounts = aservice.getAllAccounts();
-		return new ResponseEntity<>(accounts, HttpStatus.OK);
-	}
-
-	@PostMapping("/addaccount")
-	public ResponseEntity<Account> addAccount(@RequestBody Account account) {
-		Account newAccount = aservice.addAccount(account);
-		return new ResponseEntity<>(newAccount, HttpStatus.OK);
-	}
-
-	@GetMapping("/getaccount/{id}")
-	public ResponseEntity<Account> getAccount(@PathVariable Long id) throws AccountNotFoundException {
-		Account account = aservice.getAccount(id);
-		return new ResponseEntity<>(account, HttpStatus.OK);
-	}
-
-	@PutMapping("/updateaccount")
-	public ResponseEntity<Account> updateAccount(@RequestBody Account account) throws AccountNotFoundException {
-		Account updatedAccount = aservice.updateAccount(account);
-		return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
-	}
-
-	@DeleteMapping("/deleteaccount/{id}")
-	public ResponseEntity<Void> deleteAccount(@PathVariable Long id) throws AccountNotFoundException {
-		aservice.deleteAccount(id);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-	
-	@PostMapping("/makepayment")
-	public ResponseEntity<Payments> makepayment(@RequestBody PaymentReq payreq) throws AccountNotFoundException {
-		Payments payment = new Payments();
-		payment.setAccount(aservice.getAccount(payreq.getAccountid()));
-		payment.setMethod(Epaymethod.valueOf(new Random().nextInt(EResponse.values().length)));
-		payment.setAmount(payreq.getAmount());
-		payment.setPaymentDate(LocalDate.now());
-		return new ResponseEntity<>(payment, HttpStatus.OK);
-	}
+    AccountService aservice;
+    @Autowired
+    PaymentService pservice;
+ 
+    @GetMapping("/getallaccounts")
+    public ResponseEntity<List<Account>> getAllAccounts() {
+        List<Account> accounts = aservice.getAllAccounts();
+        return new ResponseEntity<>(accounts, HttpStatus.OK);
+    }
+ 
+    @PostMapping("/addaccount")
+    public ResponseEntity<Account> addAccount(@RequestBody Account account) {
+        Account newAccount = aservice.addAccount(account);
+        return new ResponseEntity<>(newAccount, HttpStatus.OK);
+    }
+ 
+    @GetMapping("/getaccount/{id}")
+    public ResponseEntity<Account> getAccount(@PathVariable Long id) throws AccountNotFoundException {
+        Account account = aservice.findAccount(id);
+        return new ResponseEntity<>(account, HttpStatus.OK);
+    }
+ 
+    @PutMapping("/updateaccount")
+    public ResponseEntity<Account> updateAccount(@RequestBody Account account) throws AccountNotFoundException {
+        Account updatedAccount = aservice.updateAccount(account);
+        return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
+    }
+ 
+    @DeleteMapping("/deleteaccount/{id}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable Long id) throws AccountNotFoundException {
+        aservice.deleteAccount(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    @PostMapping("/makepayment")
+    public ResponseEntity<Payments> makepayment(@RequestBody PaymentReq payreq) {
+        try {
+            Account account = aservice.findAccount(payreq.getAccountid());
+            Payments payment = new Payments();
+            payment.setAccount(account);
+            // Set payment method based on a random selection from Epaymethod enum
+            payment.setMethod(Epaymethod.values()[new Random().nextInt(Epaymethod.values().length)]);
+            payment.setAmount(payreq.getAmount());
+            payment.setPaymentDate(LocalDate.now());
+            return new ResponseEntity<>(payment, HttpStatus.OK);
+        } catch (AccountNotFoundException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

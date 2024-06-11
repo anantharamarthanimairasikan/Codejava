@@ -18,11 +18,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -72,14 +74,29 @@ public class PaymentServiceTest {
     }
 
     @Test
-    void testDeletePayment() throws PaymentNotFoundException {
-        Long id = 1L;
+    void testDeletePayment_Success() {
+        // Mock
+        Long paymentId = 1L;
         Payments payment = new Payments();
-        when(payrep.findById(id)).thenReturn(Optional.of(payment));
+        payment.setPaymentid(paymentId);
+        when(payrep.findById(paymentId)).thenReturn(Optional.of(payment));
 
-        paymentService.deletePayment(id);
+        // Test
+        assertDoesNotThrow(() -> paymentService.deletePayment(paymentId));
+        verify(payrep, times(1)).deleteById(paymentId);
+    }
 
-        verify(payrep, times(1)).deleteById(id);
+    @Test
+    void testDeletePayment_Failure_NotFound() {
+        // Mock
+        Long paymentId = 1L;
+        when(payrep.findById(paymentId)).thenReturn(Optional.empty());
+
+        // Test
+        PaymentNotFoundException exception = assertThrows(PaymentNotFoundException.class,
+                () -> paymentService.deletePayment(paymentId));
+        assertEquals("Payment not found with id: " + paymentId, exception.getMessage());
+        verify(payrep, never()).deleteById(paymentId);
     }
 
     @Test
@@ -163,14 +180,15 @@ public class PaymentServiceTest {
 	}
 	@Test
 	void testUpdatePayment_Failure_NotFound() {
-		if (payrep != null) {
-			Payments payment = new Payments();
-			when(payrep.findById(payment.getPaymentid())).thenReturn(Optional.empty());
+		Long paymentId = 0L;
+	    Payments payment = new Payments();
+	    payment.setPaymentid(paymentId);
+	    when(payrep.findById(paymentId)).thenReturn(Optional.empty());
 
-			PaymentNotFoundException exception = assertThrows(PaymentNotFoundException.class,
-					() -> paymentService.updatePayments(payment));
-			assertEquals("Payment not found with id: " + payment.getPaymentid(), exception.getMessage());
-		}
+	    // When and Then
+	    PaymentNotFoundException exception = assertThrows(PaymentNotFoundException.class,
+	            () -> paymentService.updatePayments(payment));
+	    assertEquals("Payment details not found with id: " + paymentId, exception.getMessage());
 	}
 
 	@Test
@@ -181,18 +199,6 @@ public class PaymentServiceTest {
 
 			PaymentNotFoundException exception = assertThrows(PaymentNotFoundException.class,
 					() -> paymentService.getPayment(id));
-			assertEquals("Payment not found with id: " + id, exception.getMessage());
-		}
-	}
-
-	@Test
-	void testDeletePayment_Failure_NotFound() {
-		if (payrep != null) {
-			Long id = 1L;
-			when(payrep.findById(id)).thenReturn(Optional.empty());
-
-			PaymentNotFoundException exception = assertThrows(PaymentNotFoundException.class,
-					() -> paymentService.deletePayment(id));
 			assertEquals("Payment not found with id: " + id, exception.getMessage());
 		}
 	}

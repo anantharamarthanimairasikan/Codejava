@@ -1,4 +1,6 @@
 package com.prodapt.capstoneproject.security.payload.response;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,11 +16,13 @@ public class JwtResponse {
 	private String tokenType = "Bearer";
 	private Long id;
 	private String username;
+	private List<String> role;
 
-	public JwtResponse(String accessToken, Long id, String username) {
+	public JwtResponse(String accessToken, Long id, String username,List<String> roles) {
 		this.accessToken = accessToken;
 		this.id = id;
 		this.username = username;
+		this.role = roles;
 		
 	}
 }

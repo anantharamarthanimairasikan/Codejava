@@ -27,35 +27,44 @@ public class NotificationController {
 	
 	@Autowired
     private NotificationService nservice;
-	
 	@PostMapping("/addnotification")
     public ResponseEntity<Notification> addNotification(@RequestBody Notification notification) {
         Notification newNotification = nservice.addNotification(notification);
         return new ResponseEntity<>(newNotification, HttpStatus.CREATED);
     }
-	
 	@GetMapping("/getallnotifications")
 	public ResponseEntity<List<Notification>> getAllNotifications() {
 	        List<Notification> notifications = nservice.getAllNotifications();
 	        return new ResponseEntity<>(notifications, HttpStatus.OK);
 	 }
-	
 	@GetMapping("/getnotification/{id}")
-    public ResponseEntity<Notification> getNotification(@PathVariable Long id) throws NotificationNotFoundException {
-        Notification notification = nservice.getNotification(id);
-        return new ResponseEntity<>(notification, HttpStatus.OK);
-    }
-	
+	public ResponseEntity<?> getNotification(@PathVariable Long id) {
+	    try {
+	        Notification notification = nservice.getNotification(id);
+	        return new ResponseEntity<>(notification, HttpStatus.OK);
+	    } catch (NotificationNotFoundException e) {
+	        return new ResponseEntity<>("Notification not found", HttpStatus.NOT_FOUND);
+	    }
+	}
+ 
 	@PutMapping("/updatenotification")
-    public ResponseEntity<Notification> updateNotification(@RequestBody Notification notification) throws NotificationNotFoundException {
-        Notification updatedNotification = nservice.updateNotification(notification);
-        return new ResponseEntity<>(updatedNotification, HttpStatus.OK);
-    }
-	
+	public ResponseEntity<?> updateNotification(@RequestBody Notification notification) {
+	    try {
+	        Notification updatedNotification = nservice.updateNotification(notification);
+	        return new ResponseEntity<>(updatedNotification, HttpStatus.OK);
+	    } catch (NotificationNotFoundException e) {
+	        return new ResponseEntity<>("Notification not found", HttpStatus.NOT_FOUND);
+	    }
+	}
+ 
 	@DeleteMapping("/deletenotification/{id}")
-    public ResponseEntity<Void> deleteNotification(@PathVariable Long id) throws NotificationNotFoundException {
-        nservice.deleteNotification(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+	public ResponseEntity<?> deleteNotification(@PathVariable Long id) {
+	    try {
+	        nservice.deleteNotification(id);
+	        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	    } catch (NotificationNotFoundException e) {
+	        return new ResponseEntity<>("Notification not found", HttpStatus.NOT_FOUND);
+	    }
+	}
 
 }

@@ -11,11 +11,11 @@ public interface AccountService {
 
 	Account updateAccount(Account account) throws AccountNotFoundException;
 
-	Account getAccount(Long id) throws AccountNotFoundException;
+	Account findAccount(Long id) throws AccountNotFoundException;
 
 	void deleteAccount(Long id) throws AccountNotFoundException;
 
 	List<Account> getAllAccounts();
 	
-	Account getAccountusingCustomerId(Integer id) throws AccountNotFoundException;
+	Account findAccountByCustomerId(Integer id) throws AccountNotFoundException;
 }

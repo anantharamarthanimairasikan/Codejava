@@ -1,6 +1,8 @@
 package com.prodapt.capstoneproject.controller;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -70,11 +72,16 @@ public class AuthController {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String jwt = jwtUtils.generateJwtToken(authentication);
 		
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
+		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();	
+		List<String> roles = userDetails.getAuthorities().stream()
+				.map(item -> item.getAuthority())
+				.collect(Collectors.toList());
+		
 
 		return ResponseEntity.ok(new JwtResponse(jwt, 
 												 userDetails.getId(), 
-												 userDetails.getUsername()));
+												 userDetails.getUsername(),
+												 roles));
 	}
 	@PostMapping("/signin/admin")
 	public ResponseEntity<JwtResponse> authenticateAdmin(@Valid @RequestBody LoginRequest loginRequest) {
@@ -86,11 +93,15 @@ public class AuthController {
 		String jwt = jwtUtils.generateJwtToken(authentication);
 		
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
-	
+		List<String> roles = userDetails.getAuthorities().stream()
+				.map(item -> item.getAuthority())
+				.collect(Collectors.toList());
+		
 
 		return ResponseEntity.ok(new JwtResponse(jwt, 
 												 userDetails.getId(), 
-												 userDetails.getUsername()));
+												 userDetails.getUsername(),
+												 roles));
 	}
 	
 	@PostMapping("/signup/customer")

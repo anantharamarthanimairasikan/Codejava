@@ -1,196 +1,148 @@
 package com.prodapt.capstoneproject.serviceimpltests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.prodapt.capstoneproject.entities.Account;
-import com.prodapt.capstoneproject.entities.Customer;
-import com.prodapt.capstoneproject.entities.Notification;
-import com.prodapt.capstoneproject.entities.Payments;
 import com.prodapt.capstoneproject.exceptions.AccountNotFoundException;
 import com.prodapt.capstoneproject.repositories.AccountsRepository;
 import com.prodapt.capstoneproject.service.AccountsServiceImpl;
 
+@SpringBootTest
 public class AccountServiceTest {
 
-    @InjectMocks
-    private AccountsServiceImpl accountService;
-
     @Mock
-    private AccountsRepository accountRepository;
+    private AccountsRepository accountsRepository;
 
-    @Test
-    void testAddAccount() {
-        if(accountRepository!=null) {
-        	
-        Account account = new Account(1L, new Customer(), Arrays.asList(new Payments(), new Payments()), Arrays.asList(new Notification(), new Notification()), LocalDate.now(), LocalDate.now(), 100, LocalDate.now());
+    @InjectMocks
+    private AccountsServiceImpl accountsService;
 
-        // Act
-        Account result = accountService.addAccount(account);
-
-        // Assert
-        assertEquals(account, result);
-        verify(accountRepository).save(account);
-    }
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testUpdateAccount_AccountFound() throws Exception {
-    	if(accountRepository!=null) {
-        Account account = new Account(1L, new Customer(), Arrays.asList(new Payments(), new Payments()), Arrays.asList(new Notification(), new Notification()), LocalDate.now(), LocalDate.now(), 100, LocalDate.now());
-        when(accountRepository.findById(account.getAccountid())).thenReturn(Optional.of(account));
-
-        // Act
-        Account updatedAccount = accountService.updateAccount(account);
-
-        // Assert
-        assertEquals(account, updatedAccount);
-        verify(accountRepository).save(account);
-    }
-    }
-
-    @Test
-    void testUpdateAccount_AccountNotFound() {
-    	if(accountRepository!=null) {
-        Account account = new Account(1L, new Customer(), Arrays.asList(new Payments(), new Payments()), Arrays.asList(new Notification(), new Notification()), LocalDate.now(), LocalDate.now(), 100, LocalDate.now());
-        when(accountRepository.findById(account.getAccountid())).thenReturn(Optional.empty());
-
-        // Act and Assert
-        AccountNotFoundException exception = assertThrows(AccountNotFoundException.class, () -> accountService.updateAccount(account));
-        assertEquals("Account not found with ID: 1", exception.getMessage());
-    }
-    }
-
-    @Test
-    void testGetAccount_AccountFound() throws Exception {
-    	if(accountRepository!=null) {
-        Account account = new Account(1L, new Customer(), Arrays.asList(new Payments(), new Payments()), Arrays.asList(new Notification(), new Notification()), LocalDate.now(), LocalDate.now(), 100, LocalDate.now());
-        when(accountRepository.findById(account.getAccountid())).thenReturn(Optional.of(account));
-
-        // Act
-        Account result = accountService.getAccount(account.getAccountid());
-
-        // Assert
-        assertEquals(account, result);
-    }
-    }
-
-    @Test
-    void testGetAccount_AccountNotFound() {
-    	if(accountRepository!=null) {
-        when(accountRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // Act and Assert
-        AccountNotFoundException exception = assertThrows(AccountNotFoundException.class, () -> accountService.getAccount(1L));
-        assertEquals("Account not found with ID: 1", exception.getMessage());
-    }
-    }
-
-    @Test
-    public void testDeleteAccount_AccountFound() throws Exception {
-    	if(accountRepository!=null) {
-        Account account = new Account(1L, new Customer(), Arrays.asList(new Payments(), new Payments()), Arrays.asList(new Notification(), new Notification()), LocalDate.now(), LocalDate.now(), 100, LocalDate.now());
-        when(accountRepository.findById(account.getAccountid())).thenReturn(Optional.of(account));
-
-        // Act
-        accountService.deleteAccount(account.getAccountid());
-
-        // Assert
-        verify(accountRepository).deleteById(account.getAccountid());
-    }
-    }
-
-    @Test
-    void testDeleteAccount_AccountNotFound() {
-    	if(accountRepository!=null) {
-        when(accountRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // Act and Assert
-        AccountNotFoundException exception = assertThrows(AccountNotFoundException.class, () -> accountService.deleteAccount(1L));
-        assertEquals("Account not found with ID: 1", exception.getMessage());
-    }
-    }
-    
-    @Test
-    void testGetAllAccounts_Success() {
-    	if(accountRepository!=null) {
-        List<Account> accounts = Arrays.asList(
-                new Account(1L, new Customer(), Arrays.asList(new Payments(), new Payments()), Arrays.asList(new Notification(), new Notification()), LocalDate.now(), LocalDate.now(), 100, LocalDate.now()),
-                new Account(2L, new Customer(), Arrays.asList(new Payments(), new Payments()), Arrays.asList(new Notification(), new Notification()), LocalDate.now(), LocalDate.now(), 200, LocalDate.now())
-        );
-        when(accountRepository.findAll()).thenReturn(accounts);
-
-        // Act
-        List<Account> result = accountService.getAllAccounts();
-
-        // Assert
-        assertEquals(accounts, result);
-        verify(accountRepository).findAll();
-    }
-    }
-
-    @Test
-    void testGetAllAccounts_EmptyList() {
-    	if(accountRepository!=null) {
-        when(accountRepository.findAll()).thenReturn(Collections.emptyList());
-
-        // Act
-        List<Account> result = accountService.getAllAccounts();
-
-        // Assert
-        assertEquals(Collections.emptyList(), result);
-        verify(accountRepository).findAll();
-    }
-    }
-
-    @Test
-    void testGetAllAccounts_Null() {
-    	if(accountRepository!=null) {
-        when(accountRepository.findAll()).thenReturn(null);
-
-        // Act and Assert
-        NullPointerException exception = assertThrows(NullPointerException.class, () -> accountService.getAllAccounts());
-        assertEquals("accountRepository.findAll() returned null", exception.getMessage());
-    }
-    }
-    
-    @Test
-    void testGetAccountusingCustomerId_Success() throws AccountNotFoundException {
-    	if(accountRepository!=null) {
-        Integer id = 1;
+    public void testAddAccount_Success() {
         Account account = new Account();
-        when(accountRepository.findByCustomerId(id)).thenReturn(Optional.of(account));
+        when(accountsRepository.save(account)).thenReturn(account);
 
-        // Act
-        Account result = accountService.getAccountusingCustomerId(id);
+        Account result = accountsService.addAccount(account);
 
-        // Assert
         assertNotNull(result);
-        assertEquals(account, result);
-    }
+        verify(accountsRepository, times(1)).save(account);
     }
 
     @Test
-    void testGetAccountusingCustomerId_Failure() {
-    	if(accountRepository!=null) {
-        Integer id = 1;
-        when(accountRepository.findByCustomerId(id)).thenReturn(Optional.empty());
+    public void testUpdateAccount_Success() throws AccountNotFoundException {
+        Account account = new Account();
+        account.setAccountid(1L);
+        when(accountsRepository.findById(1L)).thenReturn(Optional.of(account));
+        when(accountsRepository.save(account)).thenReturn(account);
 
-        // Act and Assert
-        assertThrows(AccountNotFoundException.class, () -> accountService.getAccountusingCustomerId(id));
-    }
+        Account result = accountsService.updateAccount(account);
+
+        assertNotNull(result);
+        verify(accountsRepository, times(1)).findById(1L);
+        verify(accountsRepository, times(1)).save(account);
     }
 
+    @Test
+    public void testUpdateAccount_NotFound() {
+        Account account = new Account();
+        account.setAccountid(1L);
+        when(accountsRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(AccountNotFoundException.class, () -> {
+            accountsService.updateAccount(account);
+        });
+        verify(accountsRepository, times(1)).findById(1L);
+        verify(accountsRepository, times(0)).save(account);
+    }
+
+    @Test
+    public void testFindAccount_Success() throws AccountNotFoundException {
+        Account account = new Account();
+        when(accountsRepository.findById(1L)).thenReturn(Optional.of(account));
+
+        Account result = accountsService.findAccount(1L);
+
+        assertNotNull(result);
+        verify(accountsRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    public void testFindAccount_NotFound() {
+        when(accountsRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(AccountNotFoundException.class, () -> {
+            accountsService.findAccount(1L);
+        });
+        verify(accountsRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    public void testDeleteAccount_Success() throws AccountNotFoundException {
+        Account account = new Account();
+        when(accountsRepository.findById(1L)).thenReturn(Optional.of(account));
+
+        accountsService.deleteAccount(1L);
+
+        verify(accountsRepository, times(1)).findById(1L);
+        verify(accountsRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void testDeleteAccount_NotFound() {
+        when(accountsRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(AccountNotFoundException.class, () -> {
+            accountsService.deleteAccount(1L);
+        });
+        verify(accountsRepository, times(1)).findById(1L);
+        verify(accountsRepository, times(0)).deleteById(1L);
+    }
+
+    @Test
+    public void testGetAllAccounts() {
+        List<Account> accounts = Arrays.asList(new Account(), new Account());
+        when(accountsRepository.findAll()).thenReturn(accounts);
+
+        List<Account> result = accountsService.getAllAccounts();
+
+        assertEquals(2, result.size());
+        verify(accountsRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void testFindAccountByCustomerId_Success() throws AccountNotFoundException {
+        Account account = new Account();
+        when(accountsRepository.findByCustomerId(1)).thenReturn(Optional.of(account));
+
+        Account result = accountsService.findAccountByCustomerId(1);
+
+        assertNotNull(result);
+        verify(accountsRepository, times(1)).findByCustomerId(1);
+    }
+
+    @Test
+    public void testFindAccountByCustomerId_NotFound() {
+        when(accountsRepository.findByCustomerId(1)).thenReturn(Optional.empty());
+
+        assertThrows(AccountNotFoundException.class, () -> {
+            accountsService.findAccountByCustomerId(1);
+        });
+        verify(accountsRepository, times(1)).findByCustomerId(1);
+    }
 }

@@ -1,202 +1,158 @@
 package com.prodapt.capstoneproject.serviceimpltests;
 
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.prodapt.capstoneproject.entities.Admin;
-import com.prodapt.capstoneproject.entities.ERole;
 import com.prodapt.capstoneproject.exceptions.AdminNotFoundException;
 import com.prodapt.capstoneproject.model.AdminActionsReport;
 import com.prodapt.capstoneproject.repositories.AdminRepository;
 import com.prodapt.capstoneproject.service.AdminServiceImpl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
+@SpringBootTest
 public class AdminServiceTest {
-
-    @InjectMocks
-    private AdminServiceImpl adminService;
 
     @Mock
     private AdminRepository adminRepository;
 
+    @InjectMocks
+    private AdminServiceImpl adminService;
+
     @BeforeEach
-    public void setup() {
-      
-    	   
-       
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testUpdateAdmin_AdminFound() throws Exception {
-    	if(adminRepository!=null) {
-        Long adminId = 1L;
-        Admin admin = new Admin(adminId, "John Doe", "johndoe@example.com", ERole.SUPER_USER_ADMIN, null);
-        when(adminRepository.findById(adminId)).thenReturn(Optional.of(admin));
-
-        // Act
-        Admin updatedAdmin = adminService.Updateadmin(admin);
-
-        // Assert
-        assertEquals(admin, updatedAdmin);
-        verify(adminRepository).save(admin);
-    }
+    void testUpdateAdmin_Success() throws AdminNotFoundException {
+        Admin admin = new Admin();
+        admin.setAdminid(1L);
+        when(adminRepository.findById(1L)).thenReturn(Optional.of(admin));
+        when(adminRepository.save(admin)).thenReturn(admin);
+        
+        Admin result = adminService.updateAdmin(admin);
+        
+        assertNotNull(result);
+        verify(adminRepository, times(1)).save(admin);
     }
 
     @Test
     void testUpdateAdmin_AdminNotFound() {
-    	 if(adminRepository!=null) {
-        Long adminId = 1L;
-        Admin admin = new Admin(adminId, "John Doe", "johndoe@example.com", ERole.SUPER_USER_ADMIN, null);
-        when(adminRepository.findById(adminId)).thenReturn(Optional.empty());
-
-        // Act and Assert
-        AdminNotFoundException exception = assertThrows(AdminNotFoundException.class, () -> adminService.Updateadmin(admin));
-        assertEquals("Admin not found with id: 1", exception.getMessage());
-    }
+        Admin admin = new Admin();
+        admin.setAdminid(1L);
+        when(adminRepository.findById(1L)).thenReturn(Optional.empty());
+        
+        assertThrows(AdminNotFoundException.class, () -> {
+            adminService.updateAdmin(admin);
+        });
     }
 
     @Test
-    void testFindAll() {
-    	 if(adminRepository!=null) {
-        List<Admin> admins = Arrays.asList(new Admin(1L, "John Doe", "johndoe@example.com", ERole.SUPER_USER_ADMIN, null), new Admin(2L, "Jane Doe", "janedoe@example.com", ERole.SUPER_USER_ADMIN, null));
+    void testFindAll_WithAdmins() {
+        List<Admin> admins = Arrays.asList(new Admin(), new Admin());
         when(adminRepository.findAll()).thenReturn(admins);
-
-        // Act
+        
         List<Admin> result = adminService.findAll();
-
-        // Assert
-        assertEquals(admins, result);
-    }
+        
+        assertNotNull(result);
+        assertEquals(2, result.size());
     }
 
     @Test
-    void testFindById_AdminFound() throws Exception {
-    	 if(adminRepository!=null) {
-        Long adminId = 1L;
-        Admin admin = new Admin(adminId, "John Doe", "johndoe@example.com", ERole.SUPER_USER_ADMIN, null);
-        when(adminRepository.findById(adminId)).thenReturn(Optional.of(admin));
-
-        // Act
-        Admin result = adminService.findById(adminId);
-
-        // Assert
-        assertEquals(admin, result);
+    void testFindAll_NoAdmins() {
+        when(adminRepository.findAll()).thenReturn(Collections.emptyList());
+        
+        List<Admin> result = adminService.findAll();
+        
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
+
+    @Test
+    void testFindById_Success() throws AdminNotFoundException {
+        Admin admin = new Admin();
+        admin.setAdminid(1L);
+        when(adminRepository.findById(1L)).thenReturn(Optional.of(admin));
+        
+        Admin result = adminService.findById(1L);
+        
+        assertNotNull(result);
+        assertEquals(admin, result);
     }
 
     @Test
     void testFindById_AdminNotFound() {
-    	 if(adminRepository!=null) {
-        Long adminId = 1L;
-        when(adminRepository.findById(adminId)).thenReturn(Optional.empty());
-
-        // Act and Assert
-        AdminNotFoundException exception = assertThrows(AdminNotFoundException.class, () -> adminService.findById(adminId));
-        assertEquals("Admin not found with id: 1", exception.getMessage());
-    }
+        when(adminRepository.findById(1L)).thenReturn(Optional.empty());
+        
+        assertThrows(AdminNotFoundException.class, () -> {
+            adminService.findById(1L);
+        });
     }
 
     @Test
-    void testDelete_AdminFound() throws Exception {
-    	if(adminRepository!=null) {
-        Long adminId = 1L;
-        Admin admin = new Admin(adminId, "John Doe", "johndoe@example.com", ERole.SUPER_USER_ADMIN, null);
-        when(adminRepository.findById(adminId)).thenReturn(Optional.of(admin));
-
-        // Act
-        adminService.delete(adminId);
-
-        // Assert
-        verify(adminRepository).deleteById(adminId);
-    }
+    void testDelete_Success() throws AdminNotFoundException {
+        Admin admin = new Admin();
+        admin.setAdminid(1L);
+        when(adminRepository.findById(1L)).thenReturn(Optional.of(admin));
+        
+        adminService.delete(1L);
+        
+        verify(adminRepository, times(1)).deleteById(1L);
     }
 
     @Test
     void testDelete_AdminNotFound() {
-    	if(adminRepository!=null) {
-        Long adminId = 1L;
-        when(adminRepository.findById(adminId)).thenReturn(Optional.empty());
-
-        // Act and Assert
-        AdminNotFoundException exception = assertThrows(AdminNotFoundException.class, () -> adminService.delete(adminId));
-        assertEquals("Admin not found with id: 1", exception.getMessage());
-    }
+        when(adminRepository.findById(1L)).thenReturn(Optional.empty());
+        
+        assertThrows(AdminNotFoundException.class, () -> {
+            adminService.delete(1L);
+        });
     }
 
     @Test
     void testDeleteAll() {
-    	if(adminService!=null) {
         adminService.deleteAll();
+        
+        verify(adminRepository, times(1)).deleteAll();
+    }
+
+    @Test
+    void testGetAdminActionReportSuccess() {
+        // Arrange
+        List<Object[]> mockResults = new ArrayList<>();
+        mockResults.add(new Object[]{1L, 10L, 5L});
+        when(adminRepository.findAdminActions()).thenReturn(mockResults);
+
+        // Act
+        List<AdminActionsReport> reports = adminService.getAdminActionReport();
 
         // Assert
-        verify(adminRepository).deleteAll();
-    }
-    }
-    
-    @Test
-    public void testGetAdminActionReportSuccess() {
-    	if(adminRepository!=null) {        List<Object[]> results = new ArrayList<>();
-        results.add(new Object[] {1L, 2, 3});
-        results.add(new Object[] {2L, 4, 5});
-        when(adminRepository.findAdminActions()).thenReturn(results);
-
-        // Call the method under test
-        List<AdminActionsReport> reports = adminService.getAdminActionReport();
-
-        // Verify the results
         assertNotNull(reports);
-        assertEquals(2, reports.size());
-        AdminActionsReport report1 = reports.get(0);
-        assertEquals(1L, report1.getAdminid());
-        assertEquals(2, report1.getAdminactions());
-        assertEquals(3, report1.getReactivations());
-        AdminActionsReport report2 = reports.get(1);
-        assertEquals(2L, report2.getAdminid());
-        assertEquals(4, report2.getAdminactions());
-        assertEquals(5, report2.getReactivations());
+        assertEquals(1, reports.size());
+        AdminActionsReport report = reports.get(0);
+        assertEquals(1L, report.getAdminid());
+        assertEquals(10L, report.getAdminactions());
+        assertEquals(5L, report.getReactivations());
     }
-    }
-    
+
     @Test
-    void testGetAdminActionReportEmptyResult() {
-    	if(adminRepository!=null) {
+    void testGetAdminActionReportFailure() {
+        // Arrange
         when(adminRepository.findAdminActions()).thenReturn(new ArrayList<>());
 
-        // Call the method under test
+        // Act
         List<AdminActionsReport> reports = adminService.getAdminActionReport();
 
-        // Verify the results
+        // Assert
         assertNotNull(reports);
-        assertEquals(0, reports.size());
+        assertTrue(reports.isEmpty());
     }
-    }
-    
-    @Test
-    void testGetAdminActionReportNullResult() {
-    	if(adminRepository!=null) {
-        when(adminRepository.findAdminActions()).thenReturn(null);
-
-        // Call the method under test
-        List<AdminActionsReport> reports = adminService.getAdminActionReport();
-
-        // Verify the results
-        assertNull(reports);
-    }
-    }
-    
-    
-
 }

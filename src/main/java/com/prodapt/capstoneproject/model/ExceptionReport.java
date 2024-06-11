@@ -13,6 +13,6 @@ import lombok.ToString;
 @NoArgsConstructor
 public class ExceptionReport {
 	private Long accountId;
-	private Integer failed_payments;
+	private Long failed_payments;
 
 }
