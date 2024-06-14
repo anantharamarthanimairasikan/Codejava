@@ -3,6 +3,7 @@ package com.prodapt.capstoneproject.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prodapt.capstoneproject.entities.Customer;
+import com.prodapt.capstoneproject.entities.ERole;
+import com.prodapt.capstoneproject.entities.UserEntity;
 import com.prodapt.capstoneproject.exceptions.CustomerNotFoundException;
+import com.prodapt.capstoneproject.repositories.UserRepository;
 import com.prodapt.capstoneproject.service.CustomerService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 @RestController
 @Transactional
@@ -25,6 +30,13 @@ public class CustomerController {
 
 	@Autowired
     CustomerService cservice;
+	
+	@Autowired
+	UserRepository userRepository;
+	
+	@Autowired
+	PasswordEncoder encoder;	
+	
  
     // Create Operations
     @PostMapping("/addcustomer")
@@ -48,11 +60,21 @@ public class CustomerController {
  
     // Update Operations
     @PutMapping("/updatecustomer")
-    public ResponseEntity<Customer> updateCustomer(@RequestBody Customer customer) throws CustomerNotFoundException {
-        Customer updatedCustomer = cservice.updateCustomer(customer);
-        return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
-    }
- 
+    public ResponseEntity<Customer> updateCustomer(@RequestBody @Valid Customer customer) {
+        try {
+            Customer updatedCustomer = cservice.updateCustomer(customer);
+
+            UserEntity user = new UserEntity();
+            user.setUsername(customer.getUsername());
+            user.setPassword(encoder.encode(customer.getPassword()));
+            user.setRole(ERole.CUSTOMER);
+            userRepository.save(user);
+
+            return ResponseEntity.ok(updatedCustomer);
+        } catch (CustomerNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    } 
     // Delete Operations
     @DeleteMapping("/deletecustomer/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Integer id) throws CustomerNotFoundException {
